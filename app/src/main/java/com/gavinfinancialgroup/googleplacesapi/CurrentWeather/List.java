@@ -1,4 +1,4 @@
-package com.gavinfinancialgroup.googleplacesapi.Pojo;
+package com.gavinfinancialgroup.googleplacesapi.CurrentWeather;
 
 /**
  * Created by zhang on 4/22/2017.

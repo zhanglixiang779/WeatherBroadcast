@@ -39,7 +39,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities.WeatherActivity"></activity>
+        <activity android:name=".Activities.WeatherActivity" />
+        <activity android:name=".Activities.Next5Activity"></activity>
+
+        <service android:name=".JobService.JobSchedulerService"
+                 android:permission="android.permission.BIND_JOB_SERVICE"
+                 android:exported="true"/>
     </application>
 
 </manifest>

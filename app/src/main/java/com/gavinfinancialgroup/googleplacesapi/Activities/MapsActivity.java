@@ -1,6 +1,10 @@
 package com.gavinfinancialgroup.googleplacesapi.Activities;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,9 +16,13 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.TextView;
 
+import com.gavinfinancialgroup.googleplacesapi.CurrentWeather.Broadcast;
 import com.gavinfinancialgroup.googleplacesapi.Interface.ApiInterface;
-import com.gavinfinancialgroup.googleplacesapi.Pojo.Broadcast;
+import com.gavinfinancialgroup.googleplacesapi.JobService.JobSchedulerService;
 import com.gavinfinancialgroup.googleplacesapi.R;
 import com.gavinfinancialgroup.googleplacesapi.Retrofit.RestClient;
 import com.google.android.gms.common.ConnectionResult;
@@ -49,36 +57,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int DEFAULT_ZOOM_NUMBER = 12;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private Place place;
+    public static Place place;
     public static final int AUTO_COMPLETE_REQUEST_CODE = 1;
     public static final String api = "c2fee7582157b23c85a8e79de8e8db40";
-    private Location mCurrentLocation;
+    public static Location mCurrentLocation;
+    private JobScheduler jobScheduler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .build();
-        mGoogleApiClient.connect();
+        googleServiceSetup();
 
         Button weather = (Button) findViewById(R.id.weather);
         weather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Map<String, String> data = new LinkedHashMap<String, String>();
-//                data.put("lat", "-34");
-//                data.put("lon", "151");
                 if (place != null){
                     data.put("lat", String.valueOf(place.getLatLng().latitude));
                     data.put("lon", String.valueOf(place.getLatLng().longitude));
@@ -89,15 +84,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 data.put("cnt", "1");
                 data.put("appid", api);
 
-//                Map<String, String> data = new TreeMap<String, String>(hmap);
-//                Set set = data.entrySet();
-//                Iterator iterator = set.iterator();
-//                while(iterator.hasNext()) {
-//                    Map.Entry me = (Map.Entry)iterator.next();
-//                    Log.d("test", me.getKey() + ":" + me.getValue());
-//                    System.out.print(me.getKey() + ": ");
-//                    System.out.println(me.getValue());
-
                 ApiInterface apiInterface = RestClient.getInstance().create(ApiInterface.class);
                 Call<Broadcast> call = apiInterface.getBroadcast(data);
                 call.enqueue(new Callback<Broadcast>() {
@@ -106,10 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.d("test", call.request().url().toString());
                         Broadcast broadcast = response.body();
                         if (broadcast != null) {
-                            //Toast.makeText(MapsActivity.this, broadcast.getName(), Toast.LENGTH_SHORT).show();
-                            //Toast.makeText(MapsActivity.this, broadcast.getWeather().get(0).getDescription(), Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(MapsActivity.this, WeatherActivity.class);
-                            //intent.putExtra("country", broadcast.getList().get(0).getSys().getCountry());
                             intent.putExtra("city", broadcast.getList().get(0).getName());
                             intent.putExtra("min", String.valueOf(broadcast.getList().get(0).getMain().getTempMin()));
                             intent.putExtra("max", String.valueOf(broadcast.getList().get(0).getMain().getTempMax()));
@@ -128,6 +111,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 });
             }
         });
+
+        Button next5 = (Button) findViewById(R.id.next5);
+        next5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, Next5Activity.class);
+                startActivity(intent);
+            }
+        });
+
         Button search = (Button) findViewById(R.id.search);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,6 +137,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        final TextView switchStatus = (TextView) findViewById(R.id.switchStatus);
+        Switch switchButton = (Switch) findViewById(R.id.switchButton);
+        switchButton.setChecked(false);
+        switchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    switchStatus.setText("ON");
+                    scheduleNotification();
+                } else {
+                    switchStatus.setText("OFF");
+                    cancelNotification();
+                }
+            }
+        });
+        if (switchButton.isChecked()){
+            scheduleNotification();
+        } else {
+            cancelNotification();
+        }
+    }
+
+    public void scheduleNotification (){
+        JobInfo jobInfo = new JobInfo.Builder(1, new ComponentName(getBaseContext(), JobSchedulerService.class))
+                .setPeriodic(5000)
+                .build();
+        int result = jobScheduler.schedule(jobInfo);
+        if (result <=0 ){
+            Log.e("test", "Something wrong");
+        } else {
+            Log.d("test", "Job scheduled successfully");
+        }
+    }
+
+    public void cancelNotification (){
+        jobScheduler.cancelAll();
+    }
+
+    private void googleServiceSetup() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(Places.PLACE_DETECTION_API)
+                .build();
+        mGoogleApiClient.connect();
     }
 
     @Override

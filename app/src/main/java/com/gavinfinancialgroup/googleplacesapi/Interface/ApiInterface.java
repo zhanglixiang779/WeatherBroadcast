@@ -1,6 +1,7 @@
 package com.gavinfinancialgroup.googleplacesapi.Interface;
 
-import com.gavinfinancialgroup.googleplacesapi.Pojo.Broadcast;
+import com.gavinfinancialgroup.googleplacesapi.CurrentWeather.Broadcast;
+import com.gavinfinancialgroup.googleplacesapi.Next5Days.Broadcast5;
 
 import java.util.Map;
 
@@ -15,4 +16,7 @@ import retrofit2.http.QueryMap;
 public interface ApiInterface {
     @GET("data/2.5/find")
     Call<Broadcast> getBroadcast(@QueryMap Map<String,String> queries);
+
+    @GET("data/2.5/forecast")
+    Call<Broadcast5> getBroadcast5 (@QueryMap Map<String,String> queries);
 }
