@@ -7,3 +7,16 @@
 /build
 /captures
 .externalNativeBuild
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/JobService/JobSchedulerService.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Broadcast5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/List5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Wind5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Rain5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Main5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Coord5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/City5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Clouds5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Sys5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Next5Days/Weather5.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Activities/Next5Activity.java
+/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/RecyclerView/CustomAdapter.java
