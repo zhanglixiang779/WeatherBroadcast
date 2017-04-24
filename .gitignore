@@ -22,3 +22,8 @@
 /app/src/main/java/com/gavinfinancialgroup/googleplacesapi/RecyclerView/CustomAdapter.java
 /app/src/main/res/layout/activity_next5.xml
 /app/src/main/res/layout/list_item.xml
+!/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/Activities/Next5Activity.java
+!/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/JobService/JobSchedulerService.java
+!/app/src/main/java/com/gavinfinancialgroup/googleplacesapi/RecyclerView/CustomAdapter.java
+!/app/src/main/res/layout/activity_next5.xml
+!/app/src/main/res/layout/list_item.xml

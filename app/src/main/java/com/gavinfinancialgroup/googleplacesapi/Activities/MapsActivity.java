@@ -199,34 +199,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        //return super.onCreateOptionsMenu(menu);
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.menu_list, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        //return super.onOptionsItemSelected(item);
-//        switch (item.getItemId()){
-//            case R.id.search:
-//                try {
-//                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-//                            .build(this);
-//                    startActivityForResult(intent, AUTO_COMPLETE_REQUEST_CODE);
-//                } catch (GooglePlayServicesRepairableException e) {
-//                    e.printStackTrace();
-//                } catch (GooglePlayServicesNotAvailableException e) {
-//                    e.printStackTrace();
-//                }
-//                break;
-//        }
-//        return true;
-//    }
-
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
